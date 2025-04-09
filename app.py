@@ -1,74 +1,93 @@
 import streamlit as st
-from streamlit_agraph import agraph, Node, Edge, Config
+from PIL import Image
+import graphviz
 
-# Título geral
-titulo = "Fluxogramas – Provimentos COGEX/TJMA"
-st.set_page_config(page_title=titulo, layout="wide")
-st.title(titulo)
+# Configuração da página
+st.set_page_config(layout="wide")
+st.markdown(\"\"\"
+    <style>
+    .title {
+        font-size: 40px;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
+    .subtitle {
+        font-size: 20px;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    </style>
+\"\"\", unsafe_allow_html=True)
 
-# Seletor de provimento
-opcao = st.selectbox("Selecione o Provimento:", ["Provimento nº 31/2024", "Provimento nº 33/2024"])
+# Título principal
+st.markdown("<div class='title'>Provimento nº 27/2024</div>", unsafe_allow_html=True)
 
-# Definições de grafos
-if opcao == "Provimento nº 33/2024":
-    nodes = [
-        Node(id="INÍCIO", label="INÍCIO"),
-        Node(id="estudo", label="Estudo Interno da Corregedoria"),
-        Node(id="fiscalizacao", label="Necessidade em Fiscalização"),
-        Node(id="solicitacao", label="Solicitação de Atualização"),
-        Node(id="minuta", label="Redação da Minuta Normativa"),
-        Node(id="analise", label="Análise Jurídica (Código de Normas)"),
-        Node(id="precedentes", label="Consulta CNJ / Prov. 16/2022"),
-        Node(id="aprovacao", label="Aprovação Final pela COGEX"),
-        Node(id="publicacao", label="Publicação do Provimento nº 33/2024"),
-        Node(id="vinculacao", label="Vinculação às Serventias Extrajudiciais"),
-        Node(id="obrigatoriedade", label="Cumprimento Imediato Obrigatório"),
-        Node(id="FIM", label="FIM")
-    ]
-    edges = [
-        Edge(source="INÍCIO", target="estudo"),
-        Edge(source="estudo", target="fiscalizacao"),
-        Edge(source="fiscalizacao", target="solicitacao"),
-        Edge(source="solicitacao", target="minuta"),
-        Edge(source="minuta", target="analise"),
-        Edge(source="analise", target="precedentes"),
-        Edge(source="precedentes", target="aprovacao"),
-        Edge(source="aprovacao", target="publicacao"),
-        Edge(source="publicacao", target="vinculacao"),
-        Edge(source="vinculacao", target="obrigatoriedade"),
-        Edge(source="obrigatoriedade", target="FIM")
-    ]
+# Imagem de fundo do template
+st.subheader("Template Institucional")
+background = Image.open("TITULO DO PROCESSO.png")
+st.image(background, use_column_width=True)
 
-elif opcao == "Provimento nº 31/2024":
-    nodes = [
-        Node(id="INÍCIO", label="INÍCIO"),
-        Node(id="avaliar", label="Avaliar Aplicabilidade Normativa"),
-        Node(id="minuta", label="Formular Minuta de Revogação"),
-        Node(id="juridico", label="Consultar Setor Jurídico"),
-        Node(id="publicar", label="Publicar Provimento nº 31/2024"),
-        Node(id="notificar", label="Notificar Serventias"),
-        Node(id="FIM", label="FIM")
-    ]
-    edges = [
-        Edge(source="INÍCIO", target="avaliar"),
-        Edge(source="avaliar", target="minuta"),
-        Edge(source="minuta", target="juridico"),
-        Edge(source="juridico", target="publicar"),
-        Edge(source="publicar", target="notificar"),
-        Edge(source="notificar", target="FIM")
-    ]
+# Geração do fluxograma com Graphviz
+st.subheader("Fluxograma Gerado")
+dot = graphviz.Digraph()
 
-# Configuração comum do grafo
-config = Config(
-    width=1000,
-    height=600,
-    directed=True,
-    physics=False,
-    hierarchical=True,
-    nodeHighlightBehavior=True,
-    highlightColor="#F7A7A6",
-    collapsible=True
-)
+dot.attr(rankdir='TB', size='8,10')
+dot.attr('node', shape='circle', style='filled', fillcolor='lightgray')
 
-st.markdown(f"### Visualização do Fluxograma – {opcao}")
-agraph(nodes=nodes, edges=edges, config=config)
+dot.node("start", "🟠 Início", shape='ellipse', fillcolor='lightgreen')
+dot.node("erro", "▭ Denúncia sobre erro registral", shape='box', fillcolor='white')
+dot.node("decisao_pacto", "◇ Ausência de pacto antenupcial?", shape='diamond', fillcolor='lightblue')
+dot.node("levantamento", "▭ Levantar registros afetados", shape='box')
+dot.node("sumula", "◇ Aplicar Súmula 377 do STF", shape='diamond')
+dot.node("retificacao", "▭ Determinar retificação de ofício", shape='box')
+dot.node("normativa", "🗎 Emitir determinação normativa", shape='note')
+dot.node("notificar", "🗎 Notificar os cartórios", shape='note')
+dot.node("regularizar", "▭ Regularizar o registro", shape='box')
+dot.node("arquivo", "🔽 Arquivamento", shape='box', fillcolor='lightyellow')
+dot.node("fim", "🟠 Fim", shape='ellipse', fillcolor='lightgreen')
+
+dot.edge("start", "erro")
+dot.edge("erro", "decisao_pacto")
+dot.edge("decisao_pacto", "levantamento", label="Sim")
+dot.edge("levantamento", "sumula")
+dot.edge("sumula", "retificacao")
+dot.edge("retificacao", "normativa")
+dot.edge("normativa", "notificar")
+dot.edge("notificar", "regularizar")
+dot.edge("regularizar", "arquivo")
+dot.edge("arquivo", "fim")
+
+st.graphviz_chart(dot, use_container_width=True)
+
+# Simbologia e legenda
+col1, col2 = st.columns(2)
+with col1:
+    st.markdown("**Simbologia:**")
+    st.markdown(\"\"\"
+    - ▭ Processo
+    - ◇ Decisão
+    - 🗎 Documento
+    - 🔽 Arquivamento
+    - 🟠 Início/Fim
+    \"\"\")
+
+with col2:
+    st.markdown("**Legenda:**")
+    st.markdown(\"\"\"
+    Este fluxograma representa o procedimento de retificação administrativa de ofício com base no Provimento nº 27/2024,
+    envolvendo etapas de análise, aplicação da Súmula 377 do STF, e comunicação aos cartórios.
+    \"\"\")
+
+# Rodapé
+st.markdown("---")
+st.caption("Sistema de Mapeamento Automatizado - COGEX/TJMA")
+'''
+
+# Salvando em arquivo .py
+output_path = "/mnt/data/app_provimento_27.py"
+with open(output_path, "w", encoding="utf-8") as file:
+    file.write(streamlit_app_code)
+
+output_path
