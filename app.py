@@ -1,10 +1,12 @@
+# Corrigindo o erro de escape nas strings multilinha do CSS
+streamlit_app_code_fixed = '''
 import streamlit as st
 from PIL import Image
 import graphviz
 
 # Configuração da página
 st.set_page_config(layout="wide")
-st.markdown(\"\"\"
+st.markdown("""
     <style>
     .title {
         font-size: 40px;
@@ -19,7 +21,7 @@ st.markdown(\"\"\"
         margin-bottom: 30px;
     }
     </style>
-\"\"\", unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
 # Título principal
 st.markdown("<div class='title'>Provimento nº 27/2024</div>", unsafe_allow_html=True)
@@ -65,29 +67,29 @@ st.graphviz_chart(dot, use_container_width=True)
 col1, col2 = st.columns(2)
 with col1:
     st.markdown("**Simbologia:**")
-    st.markdown(\"\"\"
+    st.markdown("""
     - ▭ Processo
     - ◇ Decisão
     - 🗎 Documento
     - 🔽 Arquivamento
     - 🟠 Início/Fim
-    \"\"\")
+    """)
 
 with col2:
     st.markdown("**Legenda:**")
-    st.markdown(\"\"\"
+    st.markdown("""
     Este fluxograma representa o procedimento de retificação administrativa de ofício com base no Provimento nº 27/2024,
     envolvendo etapas de análise, aplicação da Súmula 377 do STF, e comunicação aos cartórios.
-    \"\"\")
+    """)
 
 # Rodapé
 st.markdown("---")
 st.caption("Sistema de Mapeamento Automatizado - COGEX/TJMA")
 '''
 
-# Salvando em arquivo .py
-output_path = "/mnt/data/app_provimento_27.py"
-with open(output_path, "w", encoding="utf-8") as file:
-    file.write(streamlit_app_code)
+# Salvando novamente com a correção
+output_fixed_path = "/mnt/data/app_provimento_27_CORRIGIDO.py"
+with open(output_fixed_path, "w", encoding="utf-8") as file:
+    file.write(streamlit_app_code_fixed)
 
-output_path
+output_fixed_path
