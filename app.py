@@ -1,5 +1,4 @@
-# Corrigindo o erro de escape nas strings multilinha do CSS
-streamlit_app_code_fixed = '''
+
 import streamlit as st
 from PIL import Image
 import graphviz
@@ -85,11 +84,3 @@ with col2:
 # Rodapé
 st.markdown("---")
 st.caption("Sistema de Mapeamento Automatizado - COGEX/TJMA")
-'''
-
-# Salvando novamente com a correção
-output_fixed_path = "/mnt/data/app_provimento_27_CORRIGIDO.py"
-with open(output_fixed_path, "w", encoding="utf-8") as file:
-    file.write(streamlit_app_code_fixed)
-
-output_fixed_path
